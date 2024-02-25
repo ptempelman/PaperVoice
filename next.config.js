@@ -6,6 +6,16 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+        // Add a new rule to handle .node files
+        config.module.rules.push({
+            test: /\.node$/,
+            use: 'null-loader',
+        });
+
+        // Important: return the modified config
+        return config;
+    },
     typescript: {
         ignoreBuildErrors: true,
     },
