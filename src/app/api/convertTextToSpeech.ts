@@ -1,4 +1,3 @@
-// pages/api/convertTextToSpeech.js
 import { NextApiRequest, NextApiResponse } from "next";
 import { ClientOptions, OpenAI } from "openai";
 
@@ -13,9 +12,14 @@ const openai = new OpenAI({
 } as ClientOptions);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    console.log("Request body:", req.body);
     if (req.method === 'POST') {
         try {
-            const { text } = req.body;
+            interface RequestBody {
+                text: string;
+            }
+
+            const { text } = req.body as RequestBody;
             const response = await openai.audio.speech.create({
                 model: "tts-1",
                 voice: "alloy",

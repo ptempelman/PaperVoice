@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.29.7",
     "@planetscale/database": "^1.16.0",
     "@prisma/adapter-planetscale": "^5.10.2",
     "@prisma/client": "^5.10.2",
