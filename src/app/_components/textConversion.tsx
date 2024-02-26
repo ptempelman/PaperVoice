@@ -97,7 +97,7 @@ export const PdfTextExtractor = () => {
     const convertTextToSpeechMutation = api.convert.convertTextToSpeech.useMutation();
 
     const { data: credits, refetch: refetchCredits } = api.user.credits.useQuery({ id: user?.id ?? "" });
-    const creditsRemaining = credits ?? 0;
+    const creditsRemaining = credits?.credits ?? 0;
 
     // When the subtractCreditMutation is used, we also refetch the credits remaining
     const subtractCreditMutation = api.user.subtractCredits.useMutation({
@@ -114,7 +114,7 @@ export const PdfTextExtractor = () => {
             return;
         }
 
-        if (textToConvert.length / 100 < creditsRemaining) {
+        if ((textToConvert.length / 100) < creditsRemaining) {
             console.log("Not enough credits")
             return;
         }
