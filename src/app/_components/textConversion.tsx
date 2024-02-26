@@ -1,5 +1,6 @@
 "use client";
 
+import { useUser } from '@clerk/nextjs';
 import * as pdfjs from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 pdfjs.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.js';
@@ -29,6 +30,8 @@ async function parsePdf(file: File) {
 
 
 export const PdfTextExtractor = () => {
+    const { isLoaded: userLoaded, isSignedIn, user } = useUser();
+
     const [textToConvert, setTextToConvert] = useState<string>('');
 
     const [audioSrc, setAudioSrc] = useState('');
@@ -93,7 +96,31 @@ export const PdfTextExtractor = () => {
 
     const convertTextToSpeechMutation = api.convert.convertTextToSpeech.useMutation();
 
+    const { data: credits, refetch: refetchCredits } = api.user.credits.useQuery({ id: user?.id ?? "" });
+    const creditsRemaining = credits ?? 0;
+
+    // When the subtractCreditMutation is used, we also refetch the credits remaining
+    const subtractCreditMutation = api.user.subtractCredits.useMutation({
+        onSuccess: () => {
+            void refetchCredits();
+        },
+    })
+
+
     const convertTextToSpeech = async () => {
+
+        if (!user) {
+            console.log("User not signed in")
+            return;
+        }
+
+        if (textToConvert.length / 100 < creditsRemaining) {
+            console.log("Not enough credits")
+            return;
+        }
+
+        await subtractCreditMutation.mutateAsync({ id: user.id, amount: textToConvert.length / 100 });
+
         const shortenedText = textToConvert.slice(0, 100);
         console.log(shortenedText)
 
@@ -110,7 +137,6 @@ export const PdfTextExtractor = () => {
                     }
                     const blob = new Blob([bytes], { type: 'audio/mp3' }); // Adjust the MIME type if necessary
                     const audioUrl = URL.createObjectURL(blob);
-                    console.log('Audio URL:', audioUrl);
                     // Assuming setAudioSrc is a useState hook to set the audio source
                     setAudioSrc(audioUrl);
                 }
@@ -134,6 +160,10 @@ export const PdfTextExtractor = () => {
             ></textarea>
 
             {/* Buttons container */}
+            <div className="flex items-center mb-4">
+                <p className='mr-4'>Cost: {textToConvert.length / 100} credits</p>
+                <button className='border-2 border-dashed rounded-md p-1'>Buy Credits</button>
+            </div>
             <div className="flex justify-center items-center gap-4 mb-4">
                 <div
                     onClick={handleDropAreaClick}
@@ -153,10 +183,10 @@ export const PdfTextExtractor = () => {
                     />
                 </div>
                 <button
-                    className="border-2 rounded-md p-2"
+                    className="border-2 rounded-md p-2 bg-black text-white hover:bg-gray-400 hover:text-black transition-colors"
                     onClick={convertTextToSpeech}
                 >
-                    Convert to Speech
+                    Generate Speech
                 </button>
             </div>
 

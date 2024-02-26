@@ -21,7 +21,6 @@ export const convertRouter = createTRPCRouter({
             text: z.string(),
         }))
         .mutation(async ({ input }) => {
-            console.log("Input:", input);
             try {
                 const response = await openai.audio.speech.create({
                     model: "tts-1",
@@ -29,12 +28,10 @@ export const convertRouter = createTRPCRouter({
                     input: input.text,
                 });
 
-                console.log("Response:", response);
 
                 const audioBuffer = Buffer.from(await response.arrayBuffer());
                 // Encode the buffer as a Base64 string to ensure compatibility with JSON
                 const base64Audio = audioBuffer.toString('base64');
-                console.log("Base64 audio:", base64Audio);
 
                 // Return the Base64-encoded string
                 return { audio: base64Audio };
