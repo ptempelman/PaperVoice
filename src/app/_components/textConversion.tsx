@@ -40,6 +40,7 @@ export const PdfTextExtractor = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("file change event triggered ADAFASSD")
         const files = event.target.files;
         if (files && files.length > 0) {
             const file = files[0];
