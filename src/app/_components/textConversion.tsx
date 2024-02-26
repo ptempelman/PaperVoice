@@ -162,7 +162,7 @@ export const PdfTextExtractor = () => {
             {/* Buttons container */}
             <div className="flex items-center mb-4">
                 <p className='mr-4'>Cost: {textToConvert.length / 100} credits</p>
-                <button className='border-2 border-dashed rounded-md p-1'>Buy Credits</button>
+                <button onClick={() => window.location.href = 'https://buy.stripe.com/dR66qh5eF83lbh6aEJ'} className='border-2 border-dashed rounded-md p-1'>Buy Credits</button>
             </div>
             <div className="flex justify-center items-center gap-4 mb-4">
                 <div

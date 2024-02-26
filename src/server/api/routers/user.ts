@@ -38,4 +38,18 @@ export const userRouter = createTRPCRouter({
             });
             return { credits: updatedUser.credits };
         }),
+
+    // get user id by email
+    getUserId: publicProcedure
+        .input(z.object({ email: z.string().nullish() }))
+        .query(async ({ ctx, input }) => {
+            if (!input.email) {
+                return { id: null };
+            }
+            const user = await ctx.db.user.findUnique({
+                where: { email: input.email },
+                select: { id: true },
+            });
+            return { id: user?.id };
+        }),
 });
