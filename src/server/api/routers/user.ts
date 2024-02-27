@@ -30,8 +30,11 @@ export const userRouter = createTRPCRouter({
         }),
 
     addCredits: publicProcedure
-        .input(z.object({ id: z.string(), amount: z.number().positive() }))
+        .input(z.object({ id: z.string().nullish(), amount: z.number().positive() }))
         .mutation(async ({ ctx, input }) => {
+            if (!input.id) {
+                return { credits: 0 };
+            }
             const updatedUser = await ctx.db.user.update({
                 where: { id: input.id },
                 data: { credits: { increment: input.amount } },
