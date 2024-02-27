@@ -11,13 +11,6 @@ if (!stripeSecretKey) {
     throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
 }
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
-
-
 const stripe = new Stripe(stripeSecretKey);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,7 +22,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (typeof sig !== 'string') {
             return res.status(400).send('Webhook Error: Stripe signature missing or invalid.');
         }
-
 
         let event;
 
