@@ -1,43 +1,24 @@
 // src/app/api/route.ts
-import { NextApiRequest, NextApiResponse } from 'next';
-import Stripe from 'stripe';
+import { NextResponse } from 'next/server';
+import stripe from "stripe";
 import { api } from '~/trpc/server';
 
+export async function POST(request: Request) {
+    console.log("Webhook received");
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const body = await request.text();
+    const sig = request.headers.get("stripe-signature");
 
-if (!stripeSecretKey) {
-    console.warn('STRIPE_SECRET_KEY is not set in environment variables');
-    throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
-}
-
-const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
-
-
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-
-    const text = req.body;
-    const sig = req.headers['stripe-signature'];
-
-    if (typeof sig !== 'string') {
-        return res.status(400).send('Webhook Error: Stripe signature missing or invalid.');
-    }
+    const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
     let event;
-
     try {
-        const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-        if (!stripeWebhookSecret) {
-            console.warn('STRIPE_WEBHOOK_SECRET is not set in environment variables');
-            throw new Error('STRIPE_WEBHOOK_SECRET is not set in environment variables');
-        }
-
-        event = stripe.webhooks.constructEvent(text, sig, stripeWebhookSecret);
+        event = stripe.webhooks.constructEvent(body, sig!, stripeWebhookSecret);
     } catch (err) {
-        // Assume err is of type Error
-        const error = err as Error;
-        return res.status(400).send(`Webhook Error: ${error.message}`);
+        return NextResponse.json({ message: "Webhook error", error: err });
     }
+
+    console.log("Webhook event", event);
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
@@ -48,17 +29,16 @@ export async function POST(req: NextApiRequest, res: NextApiResponse) {
         const { id: userId } = await api.user.getUserId.query({ email: session.customer_email });
 
         if (!userId) {
-            return res.status(400).send('User not found');
+            return NextResponse.json({ message: "Webhook error", error: "User not found" });
         }
 
         if (!session.amount_total || session.amount_total <= 0) {
-            return res.status(400).send('Invalid amount');
+            return NextResponse.json({ message: "Webhook error", error: "Invalid amount" });
         }
-
+        console.log("Adding credits to user", userId, session.amount_total * 300);
         await api.user.addCredits.mutate({ id: userId, amount: session.amount_total * 300 });
-
-    } else {
-        console.log(`Unhandled event type ${event.type}`);
+        return NextResponse.json({ message: "OK" });
     }
-    res.status(200).json({ received: true });
+    return new Response("", { status: 200 });
+
 }

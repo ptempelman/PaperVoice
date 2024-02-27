@@ -13,7 +13,6 @@ const config = {
             use: 'null-loader',
         });
 
-        // Important: return the modified config
         return config;
     },
     typescript: {
