@@ -12,7 +12,10 @@ export const TopBar = () => {
 
     return (
         <div className="flex justify-center items-center">
-            <p className="mr-10">Credits remaining: {credits?.credits} </p>
+            <p>Credits: {credits?.credits?.toFixed(2)}</p>
+            <div className="m-5">
+                <div className="h-2 w-2 rounded bg-gray-800"></div>
+            </div>
             {!isSignedIn && <SignInButton />}
             {isSignedIn && <UserButton appearance={{
                 elements: {
