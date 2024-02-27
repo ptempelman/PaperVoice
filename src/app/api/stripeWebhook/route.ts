@@ -1,4 +1,4 @@
-// src/api/stripeWebhook.ts
+// src/app/api/stripeWebhook.ts
 import { buffer } from 'micro';
 import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
@@ -10,6 +10,13 @@ if (!stripeSecretKey) {
     console.log('STRIPE_SECRET_KEY is not set in environment variables');
     throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
 }
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
 
 const stripe = new Stripe(stripeSecretKey);
 
