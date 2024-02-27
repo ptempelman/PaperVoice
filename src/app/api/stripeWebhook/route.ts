@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
         console.log('Checkout session completed!', session);
 
-        const { id: userId } = await api.user.getUserId.query({ email: session.customer_email });
+        const { id: userId } = await api.user.getUserId.query({ email: session.customer_details?.email });
 
         if (!userId) {
             return NextResponse.json({ message: "Webhook error", error: "User not found" });
@@ -35,8 +35,8 @@ export async function POST(request: Request) {
         if (!session.amount_total || session.amount_total <= 0) {
             return NextResponse.json({ message: "Webhook error", error: "Invalid amount" });
         }
-        console.log("Adding credits to user", userId, session.amount_total * 300);
-        await api.user.addCredits.mutate({ id: userId, amount: session.amount_total * 300 });
+        console.log("Adding credits to user", userId, (session.amount_total / 60) * 300);
+        await api.user.addCredits.mutate({ id: userId, amount: (session.amount_total / 60) * 300 });
         return NextResponse.json({ message: "OK" });
     }
     return new Response("", { status: 200 });
