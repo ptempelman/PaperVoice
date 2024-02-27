@@ -1,8 +1,8 @@
 // src/app/api/route.ts
+import { buffer } from "micro";
 import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { api } from '~/trpc/server';
-import { buffer } from "micro";
 
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -12,12 +12,18 @@ if (!stripeSecretKey) {
     throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
 }
 
-const stripe = new Stripe(stripeSecretKey);
+const stripe = new Stripe(stripeSecretKey, { apiVersion: '2023-10-16' });
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 
 
 export async function POST(req: NextApiRequest, res: NextApiResponse) {
 
-    const buf = await buffer(req);
+    const buf = (await buffer(req)).toString();
     const sig = req.headers['stripe-signature'];
 
     if (typeof sig !== 'string') {
