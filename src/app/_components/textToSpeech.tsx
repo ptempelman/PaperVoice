@@ -114,6 +114,7 @@ export const MainPanel = () => {
         if (!user) {
             console.log("User not signed in")
             handleOpenPopup("Sign in for 100 free credits");
+            setIsConvertClicked(false);
             return;
         }
         setIsConvertClicked(true);
@@ -122,6 +123,7 @@ export const MainPanel = () => {
         if ((textToConvert.length / 100) > creditsRemaining) {
             console.log("Not enough credits")
             handleOpenPopup("You do not have enough credits");
+            setIsConvertClicked(false);
             return;
         }
 
