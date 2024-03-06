@@ -201,7 +201,7 @@ export const MainPanel = () => {
             </div>
 
             {isLoading && <p className="bg-white/30 backdrop-blur-md rounded-md p-1">Loading...</p>}
-            {isConvertClicked && <LoadingBar duration={textToConvert.split(' ').length / 20} />}
+            {isConvertClicked && isSignedIn && <LoadingBar duration={textToConvert.split(' ').length / 20} />}
             {audioSrc && (
                 <audio controls src={audioSrc} className="mt-2">
                     Your browser does not support the audio element.
