@@ -122,6 +122,11 @@ export const MainPanel = () => {
             return;
         }
 
+        if (textToConvert.length >= 4000) {
+            handleOpenPopup("We can only handle up to 4000 characters for now (because of OpenAI limits)");
+            return;
+        }
+
         console.log("Credits", (textToConvert.length / 100), creditsRemaining)
         if ((textToConvert.length / 100) > creditsRemaining) {
             console.log("Not enough credits")
