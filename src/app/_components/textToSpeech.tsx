@@ -118,12 +118,12 @@ export const MainPanel = () => {
         }
 
         if (textToConvert.length >= 800) {
-            handleOpenPopup("We can only handle up to 800 characters for now (because of Vercel hosting limits)");
+            handleOpenPopup("We can only handle up to 8 credits for now (because of Vercel hosting limits)");
             return;
         }
 
         if (textToConvert.length >= 4000) {
-            handleOpenPopup("We can only handle up to 4000 characters for now (because of OpenAI limits)");
+            handleOpenPopup("We can only handle up to 40 credits for now (because of OpenAI limits)");
             return;
         }
 
